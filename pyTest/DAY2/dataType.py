@@ -1,5 +1,8 @@
 #Nunmber
 #int float bool complex
+#整型 长整型 浮点型 布尔型 复数型
+#所以类型都是对象，无普通类型
+#无 ++ 
 #int
 a = 1 #赋值
 print("int a=",a)

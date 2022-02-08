@@ -1,3 +1,4 @@
+#for 无 (i=1;i<5;i++) range(num) 模拟计数
 print("test")
 
 i=int(input("请输入"))
@@ -21,3 +22,6 @@ else :
         if j==7 :
             break
             print("break")
+
+# dataStruct
+
