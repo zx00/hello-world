@@ -19,3 +19,6 @@ print (s1==s2)
 print (s1!=s2)
 print (s1==s3)
 print (s1!=s3)
+
+#字符串格式化
+print('今年%s已经%d岁了'%('张三',10))

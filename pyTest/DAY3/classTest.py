@@ -69,7 +69,10 @@ print (f2.age)
 #修改
 f2.age=20
 print (f2.age)
+#查看当前对象类型
+print (type(1))
 #删除
 del f2.age
 print (hasattr(f2,'age'))
-print (f2.age)
+# print (f2.age)
+
