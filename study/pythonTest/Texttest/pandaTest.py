@@ -18,63 +18,38 @@ def getDirFileList(dir:str):
         if os.path.isfile(os.path.join(dir,file)):
             fileList.append(file)
     return fileList
-
-dir=r'F:\StudyTest\testPublic\hello-world\study\pythonTest\Texttest'
-fileType='xlsx'
-print(getDirFileList(dir))
-
 #使用glob获取指定目录下文件
 
 def getFileListByGlob(dir:str,fileType:str):
     files=glob.glob(os.path.join(dir,f'*.{fileType}'))
     return files
 
-for i in getFileListByGlob(dir,fileType):
-    #获取指定路径文件的文件名
-    print(os.path.basename(i))
-print(os.path.dirname(os.path.abspath(__file__)))
-print(os.getcwd())
-def patterFile():
-    files=glob.glob(os.path.join(dir,'缺陷情况*.xlsx'))
-    print(f'a={files}')
-
-patterFile()
+def patterFile(path:dir,patter:str,fileType:str)->list:
+    files=glob.glob(os.path.join(path,f'{patter}.{fileType}'))
+    return files
 
 
-
-
-def getDataForExecl(execlFile:str):
+def getnewDataForExecl(execlFile:str)->pd.DataFrame:
     #将数据转换为dataframe
     df=pd.DataFrame(pd.read_excel(execlFile))
-#将execl内容封装为类
-class EXECLFILE:
-
-    def __init__(self,execlFile:str) -> None:
-        self.pd=pd.read_excel(execlFile)
-        self.df=pd.DataFrame(self.df)
-
-
+    #填充空白
+    new=df.fillna('空白')
+    return new
 # execlFile=EXECLFILE(os.path.join(dir,'111.xlsx'))
-df=pd.DataFrame(pd.read_excel(os.path.join(dir,'111.xlsx')))
+# df=pd.DataFrame(pd.read_excel(os.path.join(dir,'111.xlsx')))
 
 # print(f'aa={df}')
 
-#填充空白
-new=df.fillna('空白')
+
 # print(new)
-new.to_excel('new.xlsx')
-
-
-print(f'data11={new["状态"]},type={type(new["状态"])}')
+# new.to_excel('new.xlsx')
+# print(f'data11={new["状态"]},type={type(new["状态"])}')
 
 
 # print(f'状态={statList},type={type(statList)}')
 
 # print(f'列名')
 #获取对应列对应数据的行数据
-
-
-
 
 #获取对应列所有信息，并且按照内容进行相应的筛选并生成对应execl
 
@@ -89,7 +64,7 @@ def getGroupByCloValue(newExecl:pd,cloName:str):
         j.to_excel(f'{cloName}为{i}的BUG情况.xlsx')
     return staDir
 
-numPieList=getGroupByCloValue(new,'状态')
+# numPieList=getGroupByCloValue(new,'状态')
 
 #饼状图数据
 
@@ -114,8 +89,42 @@ def createPie(data:dict,title:str):
     plt.title(title)
     plt.show()
 
-totalNum=len(new)
+# createPie(numPieList,'严重程度分布')
 
-print(f'new{totalNum}')
+#获取日期信息
+def getDateGroup(df:pd.DataFrame,cloumName:str)->pd.DataFrame:
+    #将对应列数据转换为datetime类型
+    df[cloumName]=pd.to_datetime(df[cloumName])
+    # 将日期列转换为周
+    df['Week'] = df[cloumName].dt.to_period('W')
+    #按照日期分组
+    grouped=df.groupby(df[cloumName].dt.date)
+    # for date,group in grouped:
+    #     print(f'Date:{date}')
+    #     print(f'Group:{group}')
+    #     print('\n')
+    # 按照周分组
+    grouped = df.groupby('Week')
 
-createPie(numPieList,'严重程度分布')
+    # 遍历每个周分组并输出行数据
+    for week, group in grouped:
+        print(f"Week: {week}")
+        print(group)
+        print("\n")
+        return grouped
+if __name__=='__main__':
+    #数据清洗
+    #获取对应目录指定文件列表
+    dir=os.path.dirname(os.path.abspath(__file__))
+    fileType='xlsx'
+    patter_str='111'
+    file_list=patterFile(dir,patter_str,fileType)
+    for f in file_list:
+        #将空白填充为指定值
+        #填充空白
+        new=getnewDataForExecl(f)
+        #按照日期进行分组展示
+        # print(f'data={new}')
+        #输出日期参数
+        getDateGroup(new,'日期')
+
