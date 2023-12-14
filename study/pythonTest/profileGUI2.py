@@ -1,3 +1,19 @@
+'''
+以下是一个使用PyQt和ADB创建展示应用内存、FPS、CPU使用情况的脚本。该脚本允许用户输入设备ID、应用包名，并使用多选按钮选择获取内存、FPS、CPU使用情况中的哪些数据。
+每个选择的数据类型都会在右侧创建一个独立的实时折线图。点击“开始监控”按钮后，实时折线图会开始更新，点击“结束监控”按钮后，数据会保存到CSV文件中。
+
+确保你已经安装了PyQt5、Matplotlib和psutil，可以使用以下命令进行安装：
+
+bash
+Copy code
+pip install PyQt5 matplotlib psutil
+
+
+'''
+
+
+
+
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QCheckBox
 from PyQt5.QtCore import Qt, QTimer

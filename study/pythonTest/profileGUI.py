@@ -1,3 +1,16 @@
+'''
+下面是一个使用PyQt和ADB创建多个实时折线图展示应用的内存和FPS数据的脚本。这个脚本允许用户输入设备ID、应用包名，并且可以选择获取内存或FPS数据，同时提供了开始和结束监控的按钮。每个监控都有独立的折线图，并在结束监控时将数据保存到CSV文件中。
+
+确保你已经安装了PyQt5和Matplotlib，可以使用以下命令进行安装：
+
+bash
+Copy code
+pip install PyQt5 matplotlib
+
+
+'''
+
+
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton
 from PyQt5.QtCore import Qt, QTimer
