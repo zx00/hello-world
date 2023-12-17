@@ -29,11 +29,17 @@ from matplotlib.figure import Figure
 class AppMonitor(QWidget):
     def __init__(self):
         super(AppMonitor, self).__init__()
-
+        #设置默认devicesID 和 默认包名
+        default_deviceID='5b57fc57'
+        default_packageName='com.ss.android.ugc.aweme'
         self.device_id_label = QLabel('Device ID:')
         self.device_id_input = QLineEdit()
+        #设置默认设备ID
+        self.device_id_input.setText(default_deviceID)
         self.package_name_label = QLabel('Package Name:')
         self.package_name_input = QLineEdit()
+         #设置默认包名
+        self.package_name_input.setText(default_packageName)
         self.memory_checkbox = QCheckBox('Memory')
         self.fps_checkbox = QCheckBox('FPS')
         self.cpu_checkbox = QCheckBox('CPU')
@@ -111,31 +117,55 @@ class AppMonitor(QWidget):
 
     def get_memory_usage(self):
         result = subprocess.check_output(['adb', '-s', self.device_id, 'shell', 'dumpsys', 'meminfo', self.package_name]).decode('utf-8')
-        match = re.search(r'Total RAM: +(\d+) kB', result)
+        # match = re.search(r'Total RAM: +(\d+) kB', result)
+        print(f'内存={result},type={type(result)}')
+        match = re.search(r'TOTAL PSS: +(\d+) ', result)
+        # print(f'内存2={match},type={type(match)}')
         if match:
             total_ram_kb = int(match.group(1))
             total_ram_mb = total_ram_kb / 1024
+            print(f'内存值={total_ram_mb}')
             return total_ram_mb
         else:
             return 0
-
+    #用直接获得的totalframe和jankframe进行计算
+    # def get_fps(self):
+    #     result = subprocess.check_output(['adb', '-s', self.device_id, 'shell', 'dumpsys', 'gfxinfo', self.package_name]).decode('utf-8')
+    #     print(f'FPS情况={result}')
+    #     match = re.search(r'Janky frames: (\d+)', result)
+    #     print(f'匹配的{match}')
+    #     if match:
+    #         janky_frames = int(match.group(1))
+    #         total_frames = self.get_total_frames(result)
+    #         fps = (total_frames - janky_frames) / total_frames * 60
+    #         return round(fps, 2)
+    #     else:
+    #         return 0
+    #用Profile data in ms:获得的1帧渲染时间来进行计算
     def get_fps(self):
         result = subprocess.check_output(['adb', '-s', self.device_id, 'shell', 'dumpsys', 'gfxinfo', self.package_name]).decode('utf-8')
-        match = re.search(r'Janky frames: (\d+)/', result)
+        print(f'FPS情况={result}')
+        match = re.search(r'Janky frames: (\d+)', result)
+        print(f'匹配的{match}')
         if match:
             janky_frames = int(match.group(1))
             total_frames = self.get_total_frames(result)
             fps = (total_frames - janky_frames) / total_frames * 60
             return round(fps, 2)
         else:
-            return 0
+            return 0  
 
     def get_total_frames(self, result):
-        match = re.search(r'Frame intervals in ms: (.+)$', result, re.MULTILINE)
+        # match = re.search(r'Frame intervals in ms: (.+)$', result, re.MULTILINE)
+        match = re.search(r'Total frames rendered: (\d+)', result)
+        print(f'总匹配={match}')
         if match:
-            intervals_str = match.group(1)
-            intervals = [int(interval) for interval in intervals_str.split()]
-            return len(intervals)
+            # intervals_str = match.group(1)
+            # intervals = [int(interval) for interval in intervals_str.split()]
+            # return len(intervals)
+            total_frames=int(match.group(1))
+            print(f'总 frame={total_frames}')
+            return total_frames
         else:
             return 0
 
@@ -150,12 +180,13 @@ class AppMonitor(QWidget):
         with open(filename, 'w', newline='') as csvfile:
             csv_writer = csv.writer(csvfile)
             csv_writer.writerow(['Timestamp', 'Memory (MB)', 'FPS', 'CPU Usage (%)'])
+            # if not (self.canvases[0].data[i] | self.canvases[1].data[i] | self.canvases[2].data[i]])
 
             for i in range(len(self.canvases[0].data)):
                 csv_writer.writerow([i + 1, self.canvases[0].data[i], self.canvases[1].data[i], self.canvases[2].data[i]])
 
         print(f'Data saved to {filename}')
-
+#折线图展示
 class AppCanvas(FigureCanvas):
     def __init__(self, figure, parent=None):
         super(AppCanvas, self).__init__(figure)
